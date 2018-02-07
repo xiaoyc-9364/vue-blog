@@ -2,11 +2,10 @@ const express = require('express')
 const router = express.Router()
 const Blog = require('./db')
 const fs = require('fs');
-const fn = () => {}
 const formidable = require('formidable');
 const LIMIT = 2;
 
-const headIconArr = fs.readdirSync('../static/images/headIcon').slice(1);
+const headIconArr = fs.readdirSync('../static/images/headIcon').slice(1);  //获取头像所在文件数组
 const random = (n, m) => Math.floor(Math.random() * (m - n + 1) + n);   //随机数
 
 //获取文章信息
@@ -16,6 +15,10 @@ router.get('/api/get-article', (req, res) => {
         doc.readNum++;  //阅读量加1
         doc.save();
         res.json(doc);
+    }).catch(e => {
+        res.redirect('/404');
+        console.error(e);
+        
     })
 });
 
@@ -27,10 +30,9 @@ router.get('/api/add-like', (req, res) => {
         doc.save();
         res.json(doc);
         return doc;
-    }).catch(e =>{
-        console.log(e);
-        res.status(404);
-        res.send('404');
+    }).catch(e => {
+        res.redirect('/404');
+        console.error(e);
     });
 });
 //添加评论
@@ -49,7 +51,8 @@ router.post('/api/add-appraise', (req, res) => {
     }).then(doc => {
         res.json(doc);
     }).catch(e => {
-        console.log(e);
+        res.redirect('/404');
+        console.error(e);
     });
 });
 //上传图片
@@ -97,6 +100,9 @@ router.post('/api/publish', (req, res) => {
         return blog.save();
     }).then(doc => {
         res.json(doc);
+    }).catch(e => {
+        res.redirect('/404');
+        console.error(e);
     });
 });
 //修改
@@ -104,7 +110,6 @@ router.post('/api/modify-article', (req, res) => {
     const body = req.body;
         id = body.id;
     Blog.findOne({_id: id}).then(doc => {
-        console.log(doc);
         doc.title = body.title;
         doc.intro = body.intro;
         doc.content = body.content;
@@ -113,7 +118,8 @@ router.post('/api/modify-article', (req, res) => {
     }).then(doc => {
         res.json(doc);
     }).catch(e => {
-        console.log(e);
+        res.redirect('/404');
+        console.error(e);
     });
 });
 //删除
@@ -122,37 +128,27 @@ router.get('/api/del-article', (req, res) => {
     Blog.remove({ _id: id }).sort({ _id: -1 }).then(doc => {
         res.send('删除成功!');
     }).catch(e => {
-        throw e;
+        res.redirect('/404');
+        console.error(e);
     });
 })
 //获取全部数据
-router.get('/api/get-blog-list', (req, res) => {
-    let query = req.query,
-        page = Number(query.page) || 1;
-    
-    Blog.find().sort({_id: -1}).then((docs) => {
-        let count = docs.length,
-            pages = Math.ceil(count / LIMIT);          //计算总页数,向上取整
-        page = Math.max(1, Math.min(pages, page));
-        const data = {
-            list: docs.slice(LIMIT * (page - 1), LIMIT * page),
-            page: page,
-            count: count,
-            limit: LIMIT,
-            pages: pages,
-        };
-        res.json(data);
-    });
+router.get('/api/blog-list', (req, res) => {
+    findData(req, res);
+});
+//单个作者文章列表
+router.get('/api/author', (req, res) => {
+    const author = req.query.author;
+    findData(req, res, {author: author});
 });
 
 //搜索
-router.post('/api/search', (req, res) => {
+router.get('/api/search', (req, res) => {
     let docsArr = [],
-        body = req.body,
-        type = body.type,
-        keyword = body.keyword;
-        page = Number(body.page) || 1;
-
+        query = req.query,
+        type = query.type,
+        keyword = query.keyword;
+        page = Number(query.page) || 1;
     Blog.find().sort({_id: -1}).then(docs => {
         docs.forEach(value => {
             const pattern = new RegExp(keyword, 'gi');      //创建正则
@@ -183,12 +179,34 @@ router.post('/api/search', (req, res) => {
             count: count,
             limit: LIMIT,
             pages: pages,
-            // path: '/blog-list/?page='
         };
         res.json(data);
     }).catch(e => {
-        console.log(e);
-    }) 
+        res.redirect('/404');
+        console.error(e);
+    });
 
 })
 module.exports = router;
+
+function findData(req, res, option) {
+    let query = req.query,
+        page = Number(query.page) || 1;
+        option = option || {};
+    Blog.find(option).sort({ _id: -1 }).then((docs) => {
+        let count = docs.length,
+            pages = Math.ceil(count / LIMIT);          //计算总页数,向上取整
+        page = Math.max(1, Math.min(pages, page));
+        const data = {
+            list: docs.slice(LIMIT * (page - 1), LIMIT * page),
+            page: page,
+            count: count,
+            limit: LIMIT,
+            pages: pages,
+        };
+        res.json(data);
+    }).catch(e => {
+        res.redirect('/404');
+        console.error(e);
+    });
+}

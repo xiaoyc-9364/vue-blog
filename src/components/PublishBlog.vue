@@ -41,15 +41,15 @@ export default {
 			content: '',
 			author: '',
 			warnText:'',
-			isEdit: false,
-			alert: false,
-			isDanger: true,
-			TIMEOUT: 1500
+			isEdit: false,		//是否是修改状态
+			alert: false,		//是否显示弹出框
+			isDanger: true,		//切换弹出框class
+			TIMEOUT: 1500		//弹出框消失时间
 		}
 	},
   	methods: {
-		uploadImg() {
-			if (!$('input[type="file"]')[0].files[0]) {
+		uploadImg() {		//上传图片
+			if (!$('input[type="file"]')[0].files[0]) {		
 				this.warnWin('请选择要上传的图片!', false);
 				return;
 			}
@@ -58,12 +58,16 @@ export default {
 				return;
 			}
 			var formData = new FormData();
-        	formData.append("file",$('input[type="file"]')[0].files[0]);
+			formData.append("file",$('input[type="file"]')[0].files[0]);
+			
 			this.$http.post('api/upload-img', formData).then(res => {
-				document.execCommand('insertimage', false, res.bodyText);
+				document.execCommand('insertimage', false, res.bodyText);  //光标位置插入图片
+			}).catch(e => {
+				this.$router.push({name: '404'});
+				console.error(e);
 			});
 		},
-		publish(e) {
+		publish(e) {		//上传文章
 			const name = e.target.getAttribute('name');
 			let attentionText, url;
 
@@ -74,7 +78,7 @@ export default {
 				attentionText = '修改成功!'
 				url = '/api/modify-article';
 			}
-			const blogContent = document.querySelector('.blog_content').innerHTML;
+			this.content = document.querySelector('.blog_content').innerHTML;
 			if (this.title === '') {
 				this.warnWin('博客标题不能为空!', false);
 				return;
@@ -83,7 +87,7 @@ export default {
 				this.warnWin('博客简介不能为空!', false);
 				return;
             }
-            if (blogContent === '') {
+            if (this.content === '') {
 				this.warnWin('博客内容不能为空!', false);
 				return;
             }
@@ -95,27 +99,28 @@ export default {
 				id: this.$route.query.id,
 				title: this.title,
 				intro: this.intro,
-				content: blogContent,
+				content: this.content,
 				author: this.author
 			}).then((res) => {
 				this.warnWin(attentionText, true);
 				setTimeout(() => {
-					this.$router.push({name: 'article', query:{id: res.body._id}});
+					this.$router.push({name: 'article', query:{id: res.body._id}});  //重定向到阅读文章组件
 				}, this.TIMEOUT);
 			}).catch(e => {
+				this.$router.push({name: '404'});
 				console.error(e);
 			});
 		},
-		reset() {
+		reset() {		//清空
 			this.title = '';
 			this.intro = '';
 			this.content = '';
 			this.author = '';
 		},
-		closeTip() {
+		closeTip() {	//关闭弹出框
 			this.alert = false;
 		},
-		warnWin(str, isfaild) {
+		warnWin(str, isfaild) {		//弹出框
 			this.warnText = str;
 			this.alert = true;
 			this.isDanger = !isfaild;
@@ -138,6 +143,7 @@ export default {
 				this.author = body.author;
 				this.isEdit = true;
 			}).catch(e => {
+				this.$router.push({name: '404'});
 				console.error(e);
 			});
 		}
@@ -156,7 +162,6 @@ export default {
 		height: 500px;
 		img {
 			display: inline;
-			vertical-align: bottom;
 			max-width: 100%;
 			max-height: 100%;
 		}

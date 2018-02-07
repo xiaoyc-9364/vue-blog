@@ -9,6 +9,7 @@ import Router from 'vue-router'
 import Article from './components/Article.vue'
 import BlogList from './components/BlogList.vue'
 import PulishBlog from './components/PublishBlog.vue'
+import Err from './components/Error.vue'
 
 Vue.use(VueResource);
 Vue.use(Router);
@@ -45,6 +46,19 @@ const router = new Router({
       path: '/search',
       name: 'search',
       component: BlogList
+    }, 
+    {
+      path: '/author',
+      name: 'author',
+      component: BlogList
+    },
+    {
+      path: '/404',
+      name: '404',
+      component: Err
+    },
+    { path: '*', 
+      component: Err 
     }
   ]
 });
@@ -58,8 +72,4 @@ Vue.config.productionTip = true;
 new Vue({
   el: '#blog',
   router,
-  data: {
-    currentRoute: window.location.pathname
-  }
-
 })

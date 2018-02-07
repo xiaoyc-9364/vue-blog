@@ -47,11 +47,12 @@ export default {
         }).then(res => {
             this.article = res.body;
         }).catch(e => {
-            console.log(e);
+            this.$router.push({name: '404'});
+            console.error(e);
         });
     },
     methods: {
-        addAppraise() {
+        addAppraise() {     //添加评论
             this.$http.post('/api/add-appraise', {
                 id: this.article._id,
                 text: this.appraiseText
@@ -59,10 +60,11 @@ export default {
                 this.article.appraises = res.body.appraises;
                 this.appraiseText = "";
             }).catch(e => {
-                console.log(e)
+                this.$router.push({name: '404'});
+                console.error(e)
             });
         },
-        addLike() {
+        addLike() {         //点赞
             this.$http.get('/api/add-like', {
                 params: {
                     id: this.$route.query.id
@@ -70,10 +72,10 @@ export default {
             }).then(res => {
                 this.article.like = res.body.like;
             }).catch(e => {
-                console.log(e)
+                this.$router.push({name: '404'});
+                console.error(e)
             });
         }
-            
     },
 }
 </script>
