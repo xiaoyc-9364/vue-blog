@@ -5,7 +5,7 @@
         <router-link  :to="{name: 'home'}" class="btn btn-primary">返回博客汇总表</router-link>
         <form class="form-inline container">
           <label for="search" class="">搜索类型:</label>
-          <select name="search_type" id="search_type" class="form-control col-md-2" v-model="searchType">
+          <select class="form-control col-md-2" v-model="type">
                   <option value="all">全部</option>
                   <option value="title">标题</option>
                   <option value="intro">简介</option>
@@ -13,24 +13,24 @@
                   <option value="author">作者</option>
           </select>
           <label for="keyword" class="">关键字:</label>
-          <input type="text" class="form-control col-md-3" id="keyword" placeholder="请输入搜索内容" v-model="keyword">
-          <router-link class="btn btn-primary col-md-1" :to="{name: 'search', query:{type:searchType, keyword: keyword, page: 1}}">搜索</router-link>
+          <input type="text" class="form-control col-md-3" placeholder="请输入搜索内容" v-model="keyword">
+          <router-link class="btn btn-primary col-md-1" :to="{name: 'search', query:{type:type, keyword: keyword, page: 1}}">搜索</router-link>
         </form>
           
-        <ul class="list-group" id="all_blog_article">
+        <ul class="list-group">
           <li v-for="(value, index) in blogList" :key="index">
-              <h2><router-link :to="{ name: 'article', query: { id: value._id }}">{{value.title}}</router-link></h2>
-              <p class="intro">简介:&nbsp;&nbsp;&nbsp;&nbsp;{{value.intro}}</p>
+              <h4><router-link :to="{ name: 'article', query: { id: value._id }}">标题:&nbsp;&nbsp;{{value.title}}</router-link></h4>
+              <p class="intro h5">简介:&nbsp;&nbsp;{{value.intro}}</p>
               <div class="detail">
                   <span class="author">
                       作者:&nbsp;
-                      <router-link :to="{name: 'author', query: {author: value.author, page:1}}">
+                      <router-link :to="{name: 'author', query: {author: value.author, page:page}}">
                           <img v-bind:src="value.headIcon" class="portrait"/>&nbsp;{{value.author}}
                       </router-link>
                   </span>
                   <span class="publish_time">发表时间: {{value.date}}</span>
                   <router-link :to="{ name: 'modify', query: { id: value._id }}">修改</router-link>
-                  <a href="javascript:;" @click.prevent="delArticle(value._id)">删除</a>
+                  <a href="javascript:void(0);" @click.prevent="delArticle(value._id)">删除</a>
                   <span class="appraise"><router-link :to="{ name: 'article', query: { id: value._id }}">评论({{value.appraises.length}})</router-link></span>
                   <span class="read_num"><router-link :to="{ name: 'article', query: { id: value._id }}">阅读({{value.readNum - 1}})</router-link></span>
                   <span class="like_num">
@@ -40,14 +40,17 @@
               </div>
           </li>
         </ul>
-        <p class="h5 text-center">一共有&nbsp;{{count}}&nbsp;条博客,
-            每页显示&nbsp;{{limit}}&nbsp;条博客,
-            一共&nbsp;{{pages}}&nbsp;页,当前第&nbsp;{{page}}&nbsp;页.</p>
+        <p class="h5 text-center">
+            一共有 {{count}} 条博客,
+            每页显示<input type="text" class="small-input" v-model="limit" @keyup.enter="gotoPage">条博客,
+            一共 {{pages}} 页,
+            当前第<input type="text" class="small-input" v-model="page" @keyup.enter="gotoPage">页.
+        </p>
         <div class="clearfix">
-          <a :href="prevpage" @click.prevent="showPage(-1)" :class="{disabled: page == 1}" class="btn btn-primary float-left">上一页</a>
-          <a :href="nextpage" @click.prevent="showPage(1)" :class="{disabled: page == pages}" class="btn btn-primary float-right">下一页</a>
+          <a :href="prevpage" @click.prevent="showList(-1)" :class="{disabled: page === 1}" class="btn btn-primary float-left">上一页</a>
+          <a :href="nextpage" @click.prevent="showList(1)" :class="{disabled: page === pages}" class="btn btn-primary float-right">下一页</a>
         </div>
-        <div class="alert alert-success"  v-show="alert">
+        <div class="alert" :class="{'alert-danger': isDanger, 'alert-success': !isDanger}" v-show="alert">
 			<button type="button" class="close" @click.prevent="closeTip">&times;</button>
 			<strong>{{warnText}}</strong>
 		</div>
@@ -62,39 +65,26 @@ export default {
             blogList: [],
             page: 1,
             pages: 1,
-            limit: 0,
+            limit: 3,
             count: 0,
             prevpage: '',
             nextpage: '',
-            searchType: 'all',
+            type: 'all',
             keyword:'',
             alert: false,
-            warnText: '',
+            isDanger: true,		//切换弹出框class
+            TIMEOUT: 1000,      //弹窗消失时间
+            warnText: '',       
         }
     },
     created() {
-        this.showPage();
+        const query = this.$route.query;  //将search转换为对象
+        this.page = query.page || 1;
+        this.showList();
     },
     methods: {
-        searchToObject() {  //将window.location.search转换为对象
-            let pairs = window.location.search.substring(1).split("&"),
-                obj = {},
-                pair,
-                i;
-
-            for ( i in pairs ) {
-                if ( pairs[i] === "" ) {
-                    continue;
-                }
-
-                pair = pairs[i].split("=");
-                obj[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
-            }
-
-            return obj;
-        },
-        setSearch(key, value) {     //设置search的值,如果没有该值则添加
-            const searchObj = this.searchToObject();
+        setQuery(key, value) {     //设置search的值,如果没有该值则添加
+            const searchObj = this.$route.query;
             let str = '', 
                 arr = [],
                 i;
@@ -109,25 +99,26 @@ export default {
             this.$http.get('/api/del-article',{
                 params: {id:id}
             }).then(res => {
-                this.warnText = res.body;
-                this.alert = true;
-                this.showPage();     //重新渲染该页
-                setTimeout(() => {
-                    this.alert = false;
-                }, 1500);
+                this.showList();     //重新渲染该页
+                this.warnWin(res.body, true);
             }).catch(e => {
                 this.$router.push({name: '404'});
-                console.log(e);
+                console.error(e);
             });
         },
-        showPage(n) {       //渲染列表,n为切换的页数
-            const searchObject = this.searchToObject();  //将search转换为对象
+        showList(n = 0) {       //渲染列表,n为切换的页数
+            if (/\D/.test(this.limit) || /\D/.test(this.page)) {
+                this.warnWin('请输入有效数字', false);
+                return;
+            }
+            const query = this.$route.query;
             this.$http.get('/api' + window.location.pathname, {
                 params: {                               //传给服务器的查询数据
-                    type: searchObject.type,
-                    keyword: searchObject.keyword,
-                    author: searchObject.author,
-                    page: Number(searchObject.page || 1) + (n || 0)
+                    type: this.type,
+                    keyword: this.keyword,
+                    author: query.author,
+                    limit: this.limit,
+                    page: Number(this.page || 1) + (n || 0)
                 }
             }).then(res => {
                 const body = res.body;
@@ -137,25 +128,40 @@ export default {
                 this.limit = body.limit;
                 this.count = body.count;
                 //重置路由
-                history.pushState({}, '', window.location.pathname + this.setSearch('page', this.page));  
+                history.pushState({}, '', window.location.pathname + this.setQuery('page', this.page));  
                 //重置上下页路由
-                this.prevpage = window.location.pathname + this.setSearch('page', this.page - 1);
-                this.nextpage = window.location.pathname + this.setSearch('page', this.page + 1);  
+                this.prevpage = window.location.pathname + this.setQuery('page', this.page - 1);
+                this.nextpage = window.location.pathname + this.setQuery('page', this.page + 1);  
             }).catch(e => {
                 this.$router.push({name: '404'});
-                console.log(e);
+                console.error(e);
             });
         },
         closeTip() {    //关闭提示框
             this.alert = false;
-        }
+        },
+        gotoPage() {
+            this.showList();
+        },
+        warnWin(str, isfaild) {		//弹出框
+			this.warnText = str;
+			this.alert = true;
+            this.isDanger = !isfaild;
+            $('div.alert').fadeIn();
+			setTimeout(() => {
+                $('div.alert').fadeOut('slow',() => {
+                    this.alert = false;
+                });
+			}, this.TIMEOUT);
+		},
     },
     watch: {
-        '$route': function() {      //路由变化是渲染列表
+        '$route': function() {      //路由变化时渲染列表
+            this.page = 1;
             if (this.keyword === '' && window.location.pathname ==='/search') {
                 this.$router.push({name: 'blog-list', query: {page: 1}});
             }
-            this.showPage();
+            this.showList();
         },
     }
 };
@@ -181,7 +187,8 @@ export default {
       li {
         margin: 10px 0;
         padding: 10px;
-        border: 1px solid #000;
+        border: 3px solid rgba(97, 181, 230, 0.712);
+        border-radius: 20px;
 
         &::after {
             content: '';
@@ -191,10 +198,7 @@ export default {
             clear: both;
         }
        
-        h2 {
-            font-size: 20px;
-            line-height: 2;
-
+        h4 {
             a {
                 color: #000;
             }
@@ -203,12 +207,12 @@ export default {
         .intro {
             height: 4.5em;
             line-height: 1.5em;
-            // white-space: n/; 
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .detail{
+            font-size: 18px;
             span {
                 display: inline-block;
 
@@ -239,11 +243,14 @@ export default {
                     }
                 }
                 &.like_num {
+                    float: right;
+                    margin-left: 30px;
+                    font-size: 16px;
                     color:rgb(238, 102, 102);
                     cursor: default;
                     img {
-                        width: 20px;
-                        height: 20px;
+                        width: 30px;
+                        height: 30px;
                     }
                 }
             }
@@ -256,5 +263,11 @@ export default {
 		top: 50%;
 		transform: translate(-50%, -200%);
 	}
+    .small-input {
+        width: 50px;
+        text-align: center;
+        // border-radius: 5px;
+        // border: 1px solid #000;
+    }
 </style>
 

@@ -1,6 +1,6 @@
-const express = require('express')
-const router = express.Router()
-const Blog = require('./db')
+const express = require('express');
+const router = express.Router();
+const Blog = require('./db');
 const fs = require('fs');
 const formidable = require('formidable');
 const LIMIT = 2;
@@ -18,8 +18,7 @@ router.get('/api/get-article', (req, res) => {
     }).catch(e => {
         res.redirect('/404');
         console.error(e);
-        
-    })
+    });
 });
 
 //点赞
@@ -40,12 +39,11 @@ router.post('/api/add-appraise', (req, res) => {
     const body = req.body,
         id = body.id,
         text = body.text;
-
     Blog.findOne({_id: id}).then(doc => {
         const appraiseInfo = {
-        date: new Date().toLocaleString(),
-        text: text
-        };
+                date: new Date().toLocaleString(),
+                text: text
+            };
         doc.appraises.unshift(appraiseInfo);     //放到数据库的前端
         return doc.save();
     }).then(doc => {
@@ -62,16 +60,16 @@ router.post('/api/upload-img', (req, res) => {
     form.extensions = true;
     form.parse(req, function(err, fields, files) {
         if (err) {
-            // res.json({status: 1, })
+            throw err;
         }
         const tmpPath = files.file.path;
         const targetPath = '../static/images/upload/' + files.file.name;
        
         fs.rename(tmpPath, targetPath, function(err) {
             if (err) {
-                console.log(err);
+                throw err
             }
-            res.send('../static/images/upload/' + files.file.name);
+            res.send(targetPath);
         });
     });
     
@@ -191,17 +189,18 @@ module.exports = router;
 
 function findData(req, res, option) {
     let query = req.query,
+        limit = query.limit || LIMIT,
         page = Number(query.page) || 1;
-        option = option || {};
+
     Blog.find(option).sort({ _id: -1 }).then((docs) => {
         let count = docs.length,
-            pages = Math.ceil(count / LIMIT);          //计算总页数,向上取整
+            pages = Math.ceil(count / limit);          //计算总页数,向上取整
         page = Math.max(1, Math.min(pages, page));
         const data = {
-            list: docs.slice(LIMIT * (page - 1), LIMIT * page),
+            list: docs.slice(limit * (page - 1), limit * page),
             page: page,
             count: count,
-            limit: LIMIT,
+            limit: limit,
             pages: pages,
         };
         res.json(data);

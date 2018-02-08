@@ -10,7 +10,6 @@
 		</div>
 		<label>内容:</label>
 		<div class="blog_content form-control" contenteditable="true" v-html="content"></div>
-
 		<div class="form-group">
 			<label class="col-form-label" for="author">作者:</label>
 			<input type="text" class="form-control" placeholder="" id="author" v-model="author">
@@ -62,8 +61,9 @@ export default {
 			
 			this.$http.post('api/upload-img', formData).then(res => {
 				document.execCommand('insertimage', false, res.bodyText);  //光标位置插入图片
+				this.$router.push({name: 'modify', query:{id: this.$route.query.id}});  //重定向到阅读文章组件
 			}).catch(e => {
-				this.$router.push({name: '404'});
+				this.warnWin('图片上传错误!', false);
 				console.error(e);
 			});
 		},
@@ -124,8 +124,11 @@ export default {
 			this.warnText = str;
 			this.alert = true;
 			this.isDanger = !isfaild;
+			$('div.alert').fadeIn();
 			setTimeout(() => {
-				this.alert = false;
+                $('div.alert').fadeOut('slow',() => {
+                    this.alert = false;
+                });
 			}, this.TIMEOUT);
 		},
 	},
@@ -159,7 +162,7 @@ export default {
 	.blog_content {
 		white-space: pre-wrap;
 		background: #fff;
-		height: 500px;
+		min-height: 500px;
 		img {
 			display: inline;
 			max-width: 100%;

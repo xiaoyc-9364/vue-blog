@@ -3,9 +3,12 @@
         <h1 class="text-center" >{{article.title}}</h1>
         <div class="text-center">
             <span class="author">作者:
-                <a :href='"/author/?author=" + article.author'>
+                <!-- <a :href='"/author/?author=" + article.author'>
                     <img :src="article.headIcon" class="portrait"/>&nbsp;{{article.author}}
-                </a>
+                </a> -->
+                <router-link :to="{name: 'author', query: {author: article.author, page:1}}">
+                    <img v-bind:src="article.headIcon" class="portrait"/>&nbsp;{{article.author}}
+                </router-link>
             </span>
             <span class="publish_time">发表时间: {{article.date}}</span>
         </div>
@@ -15,16 +18,16 @@
         <div class="content" v-html="article.content"></div>
         <div class="clearfix">
             <textarea class="form-control" id="blog-inrto" rows="3" v-model="appraiseText"></textarea>
-            <button class="btn btn-primary pull-right" id="appraise" @click="addAppraise">评价</button>
-            <a href="javascript:;" class="click_like commont" id="click_like" @click="addLike">
+            <button class="btn btn-primary float-right" id="appraise" @click="addAppraise">评价</button>
+            <a href="javascript:;" class="click_like commont float-right" id="click_like" @click="addLike">
                 <img src="../assets/images/star_click.png" alt="">
                 <span class="like_num">{{article.like}}</span>
             </a> 
         </div>
         <ul class="appraise_list">
             <li v-for="(value, index) in article.appraises" :key="index">
-                <p>{{value.text}}</p>
-                <p>{{value.date}}</p>
+                <p class="appraise_text">{{value.text}}</p>
+                <p class="appraise_date">{{value.date}}</p>
             </li>
         </ul>
     </article>
@@ -82,32 +85,32 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-  .content {
-    white-space: pre-wrap;
-    min-height: 30em;
-    padding: 15px;
-    word-wrap: break-word;
+    .content {
+        white-space: pre-wrap;
+        min-height: 30em;
+        padding: 15px;
+        word-wrap: break-word;
 
-    img {
-        max-width: 100%;
-        max-height: 100%;
-        display: inline;
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            display: inline;
+        }
     }
-  }
-  textarea {
-    resize: none;
-  }
-  .pull-right {
-    float: right;
-  }
-  .appraise_list {
+    textarea {
+        resize: none;
+    }
+    .appraise_list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
         li {
-            height: 100px;
+            // height: 100px;
             border-bottom: 1px solid #000;
             padding: 10px 15px;
             box-sizing: border-box;
-
-            .appraise_content {
+            margin: 10px 0;
+            .appraise_text {
                 white-space: pre-wrap;
                 height: 65px;
                 overflow: hidden;
@@ -124,5 +127,11 @@ export default {
         width: 20px;
         height: 20px;
         border: none;
+    }
+    textarea.form-control {
+        margin-bottom: 10px;
+    }
+    button.float-right {
+        margin-left: 20px;
     }
 </style>
