@@ -1,19 +1,20 @@
-const path = require('path')
-const express = require('express')
-const favicon = require('serve-favicon')
-const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
-const db = require('./db')
-const resolve = file => path.resolve(__dirname, file)
-const api = require('./api')
-const app = express()
+const path = require('path');
+const express = require('express');
+const favicon = require('serve-favicon');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const db = require('./db');
+const resolve = file => path.resolve(__dirname, file);
+const api = require('./api');
+const app = express();
 
-app.set('port', 8090)
-// app.use(favicon(resolve('../static/images/bitbug_favicon.ico')))
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(cookieParser())
-app.use('/dist', express.static(resolve('../dist')))
+app.set('port', 8090);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(cookieParser());
+app.use('/dist', express.static(resolve('../dist')));
+app.use('favicon.ico', favicon(resolve('../static/images/bitbug_favicon.ico')));
+
 
 app.use("*", function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -36,7 +37,7 @@ app.use(function (req, res, next) {
 app.use(function (err, req, res, next) {
   console.error(err.stack);
   res.status(500);
-  res.render('500');
+  res.send('500');
 });
 
 app.listen(app.get('port'), function () {

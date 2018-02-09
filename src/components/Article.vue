@@ -3,18 +3,16 @@
         <h1 class="text-center" >{{article.title}}</h1>
         <div class="text-center">
             <span class="author">作者:
-                <!-- <a :href='"/author/?author=" + article.author'>
-                    <img :src="article.headIcon" class="portrait"/>&nbsp;{{article.author}}
-                </a> -->
                 <router-link :to="{name: 'author', query: {author: article.author, page:1}}">
                     <img v-bind:src="article.headIcon" class="portrait"/>&nbsp;{{article.author}}
                 </router-link>
             </span>
             <span class="publish_time">发表时间: {{article.date}}</span>
         </div>
-        <router-link :to="{ name: 'home'}" class="btn btn-primary">返回博客列表</router-link>
+        <a href="javascript:;" @click="goback" class="btn btn-primary">返回</a>
         <router-link :to="{ name: 'publish'}" class="btn btn-primary">写博客</router-link>
         <router-link :to="{ name: 'modify', query: { id: article._id }}" class="btn btn-primary">修改</router-link>
+        <router-link :to="{ name: 'home'}" class="btn btn-primary">返回博客列表</router-link>
         <div class="content" v-html="article.content"></div>
         <div class="clearfix">
             <textarea class="form-control" id="blog-inrto" rows="3" v-model="appraiseText"></textarea>
@@ -45,7 +43,8 @@ export default {
     created() {
         this.$http.get('/api/get-article', {
             params: {
-                id: this.$route.query.id
+                id: this.$route.query.id,
+                isModify: this.$route.query.isModify
             }
         }).then(res => {
             this.article = res.body;
@@ -78,6 +77,9 @@ export default {
                 this.$router.push({name: '404'});
                 console.error(e)
             });
+        },
+        goback() {
+            this.$router.go(-1);
         }
     },
 }
@@ -105,7 +107,6 @@ export default {
         margin: 0;
         padding: 0;
         li {
-            // height: 100px;
             border-bottom: 1px solid #000;
             padding: 10px 15px;
             box-sizing: border-box;

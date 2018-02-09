@@ -4,10 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>vue-blog</title>
+    <style>
+      .fade-enter-active {
+        transition: all .4s .2s;
+      }
+      .fade-leave-active {
+        transition: all .2s;
+      }
+      .fade-enter, .fade-leave-to {
+        opacity: 0;
+      }
+    </style>
   </head>
   <body class="jumbotron">
     <div id="blog">
-      <router-view></router-view>
+      <transition name="fade">
+        <router-view></router-view>
+      </transition>
     </div>
   </body>
 </html>

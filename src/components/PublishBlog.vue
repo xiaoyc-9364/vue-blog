@@ -19,18 +19,16 @@
 			<label for="img-file"></label>
 			<input type="file" class="form-control-file col-md-3" id="img-file" aria-describedby="fileHelp">
 			<button @click="uploadImg" class="btn btn-primary col-md-1 col-md-offset-1">上传图片</button>
-			<button @click="publish($event)" name="publish" v-show="!isEdit" class="btn btn-primary col-md-1 col-md-offset-1">发布</button>
-			<button @click="publish($event)" name="modify" v-show="isEdit" class="btn btn-primary col-md-1 col-md-offset-1">修改</button>
+			<button @click="publish($event)" name="publish" v-show="!isModify" class="btn btn-primary col-md-1 col-md-offset-1">发布</button>
+			<button @click="publish($event)" name="modify" v-show="isModify" class="btn btn-primary col-md-1 col-md-offset-1">保存</button>
 			<button @click="reset" class="btn btn-primary col-md-1 col-md-offset-1">清空</button>
 		</div>
-		<div class="alert" :class="{'alert-danger': isDanger, 'alert-success': !isDanger}" v-show="alert">
-			<button type="button" class="close" @click.prevent="closeTip">&times;</button>
-			<strong>{{warnText}}</strong>
-		</div>
+		<AlertWin :props="alert, isDanger, warnText"/>
 	</main>
 </template>
 
 <script>
+import AlertWin from './AlertWin.vue'
 export default {
 	name: 'PulishBlog',
 	data () {
@@ -40,12 +38,13 @@ export default {
 			content: '',
 			author: '',
 			warnText:'',
-			isEdit: false,		//是否是修改状态
+			isModify: false,		//是否是修改状态
 			alert: false,		//是否显示弹出框
 			isDanger: true,		//切换弹出框class
 			TIMEOUT: 1500		//弹出框消失时间
 		}
 	},
+	components:{AlertWin},
   	methods: {
 		uploadImg() {		//上传图片
 			if (!$('input[type="file"]')[0].files[0]) {		
@@ -54,6 +53,7 @@ export default {
 			}
 			if(!/\.(png|jpe?g|gif)(\?.*)?$/.test($('input[type="file"]')[0].files[0].name)) {
 				this.warnWin('请上传png,jpeg,jpg或者gif格式的图片!', false);
+				$('input[type="file"]').val('');
 				return;
 			}
 			var formData = new FormData();
@@ -61,7 +61,8 @@ export default {
 			
 			this.$http.post('api/upload-img', formData).then(res => {
 				document.execCommand('insertimage', false, res.bodyText);  //光标位置插入图片
-				this.$router.push({name: 'modify', query:{id: this.$route.query.id}});  //重定向到阅读文章组件
+				$('input[type="file"]').val('');
+				this.$router.push({name: 'modify', query:{id: this.$route.query.id}});
 			}).catch(e => {
 				this.warnWin('图片上传错误!', false);
 				console.error(e);
@@ -104,7 +105,7 @@ export default {
 			}).then((res) => {
 				this.warnWin(attentionText, true);
 				setTimeout(() => {
-					this.$router.push({name: 'article', query:{id: res.body._id}});  //重定向到阅读文章组件
+					this.$router.push({name: 'article', query:{id: res.body._id, isModify: this.isModify}});  //重定向到阅读文章组件
 				}, this.TIMEOUT);
 			}).catch(e => {
 				this.$router.push({name: '404'});
@@ -116,9 +117,6 @@ export default {
 			this.intro = '';
 			this.content = '';
 			this.author = '';
-		},
-		closeTip() {	//关闭弹出框
-			this.alert = false;
 		},
 		warnWin(str, isfaild) {		//弹出框
 			this.warnText = str;
@@ -136,7 +134,8 @@ export default {
 		if(this.$route.query.id) {
 			this.$http.get('/api/get-article', {
 				params: {
-					id: this.$route.query.id
+					id: this.$route.query.id,
+					isModify: true
 				}
 			}).then(res => {
 				const body = res.body;
@@ -144,7 +143,7 @@ export default {
 				this.intro = body.intro;
 				this.content = body.content;
 				this.author = body.author;
-				this.isEdit = true;
+				this.isModify = true;
 			}).catch(e => {
 				this.$router.push({name: '404'});
 				console.error(e);
@@ -159,7 +158,7 @@ export default {
 	textarea {
 		resize: none;
 	}
-	.blog_content {
+	.blog_content.form-control {
 		white-space: pre-wrap;
 		background: #fff;
 		min-height: 500px;
@@ -174,11 +173,5 @@ export default {
 	}
 	.btn{
 		margin-right: 20px;
-	}
-	div.alert {
-		position: fixed;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -200%);
 	}
 </style>
