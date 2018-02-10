@@ -4,6 +4,7 @@ import Vue from 'vue'
 import VueResource from 'vue-resource'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.min'
+
 import $ from 'jquery'
 import Router from 'vue-router'
 import Article from './components/Article.vue'
@@ -73,18 +74,7 @@ new Vue({
   el: '#blog',
   router,
   date: {
+    
       name: 'slide-right',
-  },
-  watch: {
-    '$route'(to, from) {
-      const toDepth = to.path.split('/').length
-      const fromDepth = from.path.split('/').length
-      // this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
-    },
-  },
-  methods: {
-    fade() {
-
-    }
   }
 })

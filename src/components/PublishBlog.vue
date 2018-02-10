@@ -23,7 +23,7 @@
 			<button @click="publish($event)" name="modify" v-show="isModify" class="btn btn-primary col-md-1 col-md-offset-1">保存</button>
 			<button @click="reset" class="btn btn-primary col-md-1 col-md-offset-1">清空</button>
 		</div>
-		<AlertWin :props="alert, isDanger, warnText"/>
+		<AlertWin :props="alert, isDanger, warnText" @closedTip="closeTip"/>
 	</main>
 </template>
 
@@ -39,9 +39,9 @@ export default {
 			author: '',
 			warnText:'',
 			isModify: false,		//是否是修改状态
-			alert: false,		//是否显示弹出框
-			isDanger: true,		//切换弹出框class
-			TIMEOUT: 1500		//弹出框消失时间
+			alert: false,			//是否显示弹出框
+			isDanger: true,			//切换弹出框class
+			TIMEOUT: 1500			//弹出框消失时间
 		}
 	},
 	components:{AlertWin},
@@ -118,6 +118,9 @@ export default {
 			this.content = '';
 			this.author = '';
 		},
+		closeTip() {
+			this.alert = false;
+		},
 		warnWin(str, isfaild) {		//弹出框
 			this.warnText = str;
 			this.alert = true;
@@ -158,12 +161,12 @@ export default {
 	textarea {
 		resize: none;
 	}
-	.blog_content.form-control {
+	.blog_content {
 		white-space: pre-wrap;
 		background: #fff;
 		min-height: 500px;
-		img {
-			display: inline;
+		/deep/ img {
+			vertical-align: bottom;
 			max-width: 100%;
 			max-height: 100%;
 		}

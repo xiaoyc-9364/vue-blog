@@ -1,7 +1,7 @@
 <template>
     <div class="alert" :class="{'alert-danger': isDanger, 'alert-success': !isDanger}" v-show="show">
-                <button type="button" class="close" @click.prevent="closeTip">&times;</button>
-                <strong>{{warnText}}</strong>
+        <!-- <button type="button" class="close" @click="closeTip">&times;</button> -->
+        <strong>{{warnText}}</strong>
     </div>
 </template>
 <script>
@@ -12,12 +12,7 @@
                 show: this.alert
             }
         },
-        props: ['isDanger', 'warnText', 'alert', 'warnText'],
-        methods: {
-            closeTip() {
-                this.show = false;
-            }
-        },
+        props: ['isDanger', 'warnText', 'alert'],
     }
 </script>
 <style lang="scss" scoped>

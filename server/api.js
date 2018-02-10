@@ -126,7 +126,7 @@ router.post('/api/modify-article', (req, res) => {
 //删除
 router.get('/api/del-article', (req, res) => {
     const id = req.query.id;
-    Blog.remove({ _id: id }).sort({ _id: -1 }).then(doc => {
+    Blog.remove({ _id: id }).then(doc => {
         res.send('删除成功!');
     }).catch(e => {
         res.redirect('/404');
@@ -179,7 +179,7 @@ function findData(req, res) {
             keyword = query.keyword,
             page = Number(query.page) || 1,
             author = query.author;
-        
+
         if (keyword) {
             docs.forEach(value => {
                 const pattern = new RegExp(keyword, 'gi');      //创建正则
