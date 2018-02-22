@@ -71,7 +71,7 @@ export default {
         return {
             blogList: [],
             blogId: '',
-            page: 1,
+            // page: 1,
             pages: 1,
             limit: 2,
             count: 0,
@@ -188,11 +188,11 @@ export default {
                 this.$router.push({name: 'blog-list', query: {page: 1}});
             }
             if (window.location.pathname ==='/blog-list') {
-                this.tyep = 'all';
+                this.type = 'all';
                 this.keyword = '';
             }
             this.showList();
-        },
+        }
     }
 };
 </script>

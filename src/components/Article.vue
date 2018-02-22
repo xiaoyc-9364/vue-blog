@@ -93,7 +93,8 @@ export default {
         padding: 15px;
         word-wrap: break-word;
 
-        img {
+        /deep/ img {
+            vertical-align: bottom;
             max-width: 100%;
             max-height: 100%;
             display: inline-block;
