@@ -8,16 +8,16 @@ const resolve = file => path.resolve(__dirname, file);
 const api = require('./api');
 const app = express();
 
-app.set('port', 8090);
+app.set('port', 8091);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-// app.use('/static', express.static(resolve('../dist/static')));
+app.use('/static', express.static(resolve('../dist/static')));
 // app.use('favicon.ico', favicon(resolve('../static/images/bitbug_favicon.ico')));
 
 
 app.use("*", function (req, res, next) {
-  console.log(req.query);
+  // console.log(req.query);
   res.header('Access-Control-Allow-Origin', '*');
   res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
   res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
