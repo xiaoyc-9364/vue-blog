@@ -8,6 +8,16 @@ const LIMIT = 2;
 const headIconArr = fs.readdirSync('../static/images/headIcon').slice(1);  //获取头像所在文件数组
 const random = (n, m) => Math.floor(Math.random() * (m - n + 1) + n);   //随机数
 
+router.get('/', (req, res) => {
+    fs.readFile('../dist/index.html', function(err, data) {
+        if (err) {
+            throw err;
+        }
+        res.writeHead(200, {'Content-type': 'text/html; charset=utf-8'});
+        res.end(data);
+    });
+});
+
 //获取文章信息
 router.get('/api/get-article', (req, res) => {
     const query = req.query;

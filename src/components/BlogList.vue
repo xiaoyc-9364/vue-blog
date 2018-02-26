@@ -124,7 +124,7 @@ export default {
                 this.warnWin(res.body, true);
                 this.isDel = false;
             }).catch(e => {
-                this.$router.push({name: '404'});
+                // this.$router.push({name: '404'});
                 console.error(e);
             });
         },
@@ -159,7 +159,7 @@ export default {
                 this.prevpage = pathname + this.setQuery('page', this.page - 1);
                 this.nextpage = pathname + this.setQuery('page', this.page + 1);  
             }).catch(e => {
-                this.$router.push({name: '404'});
+                // this.$router.push({name: '404'});
                 console.error(e);
             });
         },

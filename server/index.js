@@ -7,17 +7,27 @@ const db = require('./db');
 const resolve = file => path.resolve(__dirname, file);
 const api = require('./api');
 const app = express();
+const fs = require('fs');
 
-app.set('port', 8892);
+app.set('port', 8090);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use('/static', express.static(resolve('../dist/static')));
-// app.use('favicon.ico', favicon(resolve('../static/images/bitbug_favicon.ico')));
-
+// app.use('/favicon.ico', favicon(resolve('../dist/static/img/bitbug_favicon.ico')));
+app.use('/favicon.ico', function(req, res, next) {
+  fs.readFile('../dist/static/img/bitbug_favicon.ico', function (err, data) {
+    if (err) {
+      throw err;
+    } else {
+      res.writeHead(200, { 'Content-Type': 'image/x-icon' });
+      res.write(data);
+      res.end();
+    }
+  });
+});
 
 app.use("*", function (req, res, next) {
-  // console.log(req.query);
   res.header('Access-Control-Allow-Origin', '*');
   res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
   res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
@@ -32,7 +42,7 @@ app.use(api);
 
 app.use(function (req, res, next) {
   res.status(404);
-  res.redirect('/404');
+  // res.redirect('/404');
 });
 
 app.use(function (err, req, res, next) {
