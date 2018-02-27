@@ -88,7 +88,7 @@ router.post('/api/publish', (req, res) => {
         content = body.content,
         author = body.author;
     const i = random(0, headIconArr.length - 1);
-    let headIcon = resolve('../static/images/headIcon/') + headIconArr[i];
+    let headIcon = '../static/images/headIcon/' + headIconArr[i];
     Blog.find({author: author}).then(docs => {
         if (docs.length > 0) {
             headIcon = docs[0].headIcon;
