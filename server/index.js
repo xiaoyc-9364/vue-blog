@@ -14,20 +14,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use('/static', express.static(resolve('../dist/static')));
-// app.use('/favicon.ico', favicon(resolve('../dist/static/img/bitbug_favicon.ico')));
-app.use('/favicon.ico', function(req, res, next) {
-  fs.readFile('../dist/static/img/bitbug_favicon.ico', function (err, data) {
-    if (err) {
-      throw err;
-    } else {
-      res.writeHead(200, { 'Content-Type': 'image/x-icon' });
-      res.write(data);
-      res.end();
-    }
-  });
-});
+app.use('/favicon.ico', favicon(resolve('../dist/static/images/bitbug_favicon.ico')));
 
 app.use("*", function (req, res, next) {
+  // console.log(req.url);
   res.header('Access-Control-Allow-Origin', '*');
   res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
   res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
@@ -41,8 +31,13 @@ app.use("*", function (req, res, next) {
 app.use(api);
 
 app.use(function (req, res, next) {
-  res.status(404);
-  // res.redirect('/404');
+  fs.readFile(resolve('../dist/index.html'), function (err, data) {
+    if (err) {
+      throw err;
+    }
+    res.writeHead(200, { 'Content-type': 'text/html; charset=utf-8' });
+    res.end(data);
+  });
 });
 
 app.use(function (err, req, res, next) {

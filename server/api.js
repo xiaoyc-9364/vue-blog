@@ -10,16 +10,6 @@ const LIMIT = 2;
 const headIconArr = fs.readdirSync(resolve('../static/images/headIcon')).slice(1);  //获取头像所在文件数组
 const random = (n, m) => Math.floor(Math.random() * (m - n + 1) + n);   //随机数
 
-router.get('/', (req, res) => {
-    fs.readFile(resolve('../dist/index.html'), function(err, data) {
-        if (err) {
-            throw err;
-        }
-        res.writeHead(200, {'Content-type': 'text/html; charset=utf-8'});
-        res.end(data);
-    });
-});
-
 //获取文章信息
 router.get('/api/get-article', (req, res) => {
     const query = req.query;
@@ -153,7 +143,6 @@ router.get('/api/blog-list', (req, res) => {
             count = docs.length,
             limit = query.limit || LIMIT,
             pages = Math.ceil(count / limit);          //计算总页数,向上取整
-
         page = Math.max(1, Math.min(pages, page));  //当前页的取值范围
 
         const data = {

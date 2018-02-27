@@ -27,16 +27,16 @@ const Blog = new Schema({
 
 });
 
-mongoose.connect('mongodb://127.0.0.1:27022/blogs')
+mongoose.connect('mongodb://127.0.0.1:27021/blogs')
 
 const db = mongoose.connection
 
 db.on('error', function () {
-  console.log('Database connection error.')
+  console.log('数据库连接失败!');
 })
 
 db.once('open', function () {
-  console.log('The database has connected.')
+  console.log('数据库连接成功!');
 })
 
 module.exports = mongoose.model('blog', Blog);
