@@ -68,7 +68,7 @@ router.post('/api/upload-img', (req, res) => {
             throw err;
         }
         const tmpPath = files.file.path;
-        const targetPath = resolve('../static/images/upload/') + files.file.name;
+        const targetPath = '/static/images/upload/' + files.file.name;
        
         fs.rename(tmpPath, targetPath, function(err) {
             if (err) {
