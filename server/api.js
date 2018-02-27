@@ -2,14 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Blog = require('./db');
 const fs = require('fs');
+const path = require('path');
+const resolve = file => path.resolve(__dirname, file);
 const formidable = require('formidable');
 const LIMIT = 2;
 
-const headIconArr = fs.readdirSync('../static/images/headIcon').slice(1);  //获取头像所在文件数组
+const headIconArr = fs.readdirSync(resolve('../static/images/headIcon')).slice(1);  //获取头像所在文件数组
 const random = (n, m) => Math.floor(Math.random() * (m - n + 1) + n);   //随机数
 
 router.get('/', (req, res) => {
-    fs.readFile('../dist/index.html', function(err, data) {
+    fs.readFile(resolve('../dist/index.html'), function(err, data) {
         if (err) {
             throw err;
         }
@@ -76,7 +78,7 @@ router.post('/api/upload-img', (req, res) => {
             throw err;
         }
         const tmpPath = files.file.path;
-        const targetPath = '../static/images/upload/' + files.file.name;
+        const targetPath = resolve('../static/images/upload/') + files.file.name;
        
         fs.rename(tmpPath, targetPath, function(err) {
             if (err) {
@@ -96,7 +98,7 @@ router.post('/api/publish', (req, res) => {
         content = body.content,
         author = body.author;
     const i = random(0, headIconArr.length - 1);
-    let headIcon = '../static/images/headIcon/' + headIconArr[i];
+    let headIcon = resolve('../static/images/headIcon/') + headIconArr[i];
     Blog.find({author: author}).then(docs => {
         if (docs.length > 0) {
             headIcon = docs[0].headIcon;

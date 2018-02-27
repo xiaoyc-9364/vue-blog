@@ -53,11 +53,11 @@ const router = new Router({
       name: 'author',
       component: BlogList
     },
-    // {
-    //   path: '/404',
-    //   name: '404',
-    //   component: Err
-    // },
+    {
+      path: '/404',
+      name: '404',
+      component: Err
+    },
     { path: '*', 
       component: Err 
     }
