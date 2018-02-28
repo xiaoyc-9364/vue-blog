@@ -65,7 +65,6 @@ const router = new Router({
 });
 
 Vue.http.options.emulateJSON = true;
-
   
 Vue.config.productionTip = true;
 
@@ -73,8 +72,4 @@ Vue.config.productionTip = true;
 new Vue({
   el: '#blog',
   router,
-  date: {
-    
-      name: 'slide-right',
-  }
 })

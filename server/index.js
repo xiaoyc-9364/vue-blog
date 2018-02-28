@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use('/static', express.static(resolve('../dist/static')));
-app.use('/favicon.ico', favicon(resolve('../dist/static/images/bitbug_favicon.ico')));
+// app.use('/favicon.ico', favicon(resolve('../dist/static/images/bitbug_favicon.ico')));
 
 app.use("*", function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -32,6 +32,7 @@ app.use(api);
 app.use(function (req, res, next) {
   fs.readFile(resolve('../dist/index.html'), function (err, data) {
     if (err) {
+      res.status(404);
       throw err;
     }
     res.writeHead(200, { 'Content-type': 'text/html; charset=utf-8' });

@@ -28,10 +28,12 @@
                 <p class="appraise_date">{{value.date}}</p>
             </li>
         </ul>
+        <Gotop/>
     </article>
 </template>
 
 <script>
+import Gotop from './Gotop'
 export default {
     name: 'Article',
     data () {
@@ -40,6 +42,7 @@ export default {
         appraiseText: ''
         }
     },
+    components: {Gotop},
     created() {
         this.$http.get('/api/get-article', {
             params: {

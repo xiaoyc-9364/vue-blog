@@ -51,6 +51,7 @@
             <a :href="nextpage" @click.prevent="showList(1)" :class="{disabled: page === pages}" class="btn btn-primary float-right">下一页</a>
         </div>
         <AlertWin :props="alert, isDanger, warnText"/>
+        <Gotop/>
         <div class="card border-primary mb-3 fixed-center" style="max-width: 20rem;" v-show="isDel">
             <div class="card-header">确认删除</div>
             <div class="card-body text-primary container">
@@ -64,7 +65,7 @@
 
 <script>
 import AlertWin from './AlertWin.vue'
-
+import Gotop from './Gotop'
 export default {
     name: 'BlogList',
     data () {
@@ -86,7 +87,7 @@ export default {
             warnText: '',       //弹窗文本
         }
     },
-    components: {AlertWin},
+    components: {AlertWin, Gotop},
     created() {
         const query = this.$route.query;
         this.page = query.page || 1;

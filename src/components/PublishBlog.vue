@@ -24,11 +24,13 @@
 			<button @click="reset" class="btn btn-primary col-md-1 col-md-offset-1">清空</button>
 		</div>
 		<AlertWin :props="alert, isDanger, warnText" @closedTip="closeTip"/>
+		<Gotop/>
 	</main>
 </template>
 
 <script>
 import AlertWin from './AlertWin.vue'
+import Gotop from './Gotop'
 export default {
 	name: 'PulishBlog',
 	data () {
@@ -44,7 +46,7 @@ export default {
 			TIMEOUT: 1500			//弹出框消失时间
 		}
 	},
-	components:{AlertWin},
+	components:{AlertWin, Gotop},
   	methods: {
 		uploadImg() {		//上传图片
 			if (!$('input[type="file"]')[0].files[0]) {		
