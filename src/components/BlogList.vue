@@ -71,7 +71,7 @@ export default {
         return {
             blogList: [],
             blogId: '',
-            // page: 1,
+            page: 1,
             pages: 1,
             limit: 2,
             count: 0,
@@ -144,7 +144,7 @@ export default {
                     keyword: query.keyword,
                     author: query.author,
                     limit: this.limit,
-                    page: (this.page || 1) + n
+                    page: Number(this.page || 1) + n
                 }
             }).then(res => {
                 const body = res.body;

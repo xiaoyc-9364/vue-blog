@@ -27,7 +27,7 @@ const Blog = new Schema({
 
 });
 
-mongoose.connect('mongodb://127.0.0.1:27021/blogs')
+mongoose.connect('mongodb://127.0.0.1:27022/blogs')
 
 const db = mongoose.connection
 
