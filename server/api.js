@@ -21,6 +21,7 @@ router.get('/api/get-article', (req, res) => {
         doc.save();
         res.json(doc);
     }).catch(e => {
+        res.sendStatus(404);
         res.redirect('/404');
         console.error(e);
     });
@@ -35,6 +36,7 @@ router.get('/api/add-like', (req, res) => {
         res.json(doc);
         return doc;
     }).catch(e => {
+        res.sendStatus(404);
         res.redirect('/404');
         console.error(e);
     });
@@ -54,6 +56,7 @@ router.post('/api/add-appraise', (req, res) => {
     }).then(doc => {
         res.json(doc);
     }).catch(e => {
+        res.sendStatus(404);
         res.redirect('/404');
         console.error(e);
     });
@@ -74,7 +77,6 @@ router.post('/api/upload-img', (req, res) => {
             if (err) {
                 throw err
             }
-            // res.send(targetPath);
             res.send('/static/images/upload/' + files.file.name);
         });
     });
@@ -105,6 +107,7 @@ router.post('/api/publish', (req, res) => {
     }).then(doc => {
         res.json(doc);
     }).catch(e => {
+        res.sendStatus(404);
         res.redirect('/404');
         console.error(e);
     });
@@ -122,6 +125,7 @@ router.post('/api/modify-article', (req, res) => {
     }).then(doc => {
         res.json(doc);
     }).catch(e => {
+        res.sendStatus(404);
         res.redirect('/404');
         console.error(e);
     });
@@ -132,6 +136,7 @@ router.get('/api/del-article', (req, res) => {
     Blog.remove({ _id: id }).then(doc => {
         res.send('删除成功!');
     }).catch(e => {
+        res.sendStatus(404);
         res.redirect('/404');
         console.error(e);
     });
@@ -155,6 +160,7 @@ router.get('/api/blog-list', (req, res) => {
         };
         res.json(data);
     }).catch(e => {
+        res.sendStatus(404);
         res.redirect('/404');
         console.error(e);
     });
@@ -223,6 +229,7 @@ function findData(req, res) {
         };
         res.json(data);
     }).catch(e => {
+        res.sendStatus(404);
         res.redirect('/404');
         console.error(e);
     });
